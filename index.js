@@ -121,6 +121,16 @@ app.post('/upload', (req, res) => {
       if (Array.isArray(response.data) && response.data.length > 0 && response.data[0].src) {
         const uploadedFile = response.data[0];
         const mirroredUrl = uploadedFile.src;
+
+        // Delete the file from the uploads folder
+        fs.unlink(file.path, (err) => {
+          if (err) {
+            console.error('Error deleting file:', err);
+          } else {
+            console.log('File deleted successfully');
+          }
+        });
+
         res.redirect(mirroredUrl);
       } else {
         throw new Error('Max file size 5MB. Images and videos only.');
@@ -128,6 +138,16 @@ app.post('/upload', (req, res) => {
     })
     .catch(error => {
       console.error('Error uploading file:', error);
+
+      // Delete the file from the uploads folder in case of error
+      fs.unlink(file.path, (err) => {
+        if (err) {
+          console.error('Error deleting file:', err);
+        } else {
+          console.log('File deleted successfully');
+        }
+      });
+
       res.status(500).send(`
         <script>
           alert("Max file size 5MB. Images and videos only.");
